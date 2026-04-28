@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>משחק מילים לג׳וד | لعبة الكلمات لجود</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; font-family:Arial,"Noto Sans Hebrew","Noto Sans Arabic",sans-serif; background:radial-gradient(circle at top left,#ffe2f2 0 18%,transparent 30%),radial-gradient(circle at bottom right,#d8f8ff 0 20%,transparent 34%),linear-gradient(135deg,#fff7d6,#eef5ff 55%,#f6e8ff); color:#243047; display:flex; align-items:center; justify-content:center; padding:18px; overflow-x:hidden; }
+    .app { width:min(980px,100%); background:rgba(255,255,255,.94); border-radius:34px; box-shadow:0 20px 55px rgba(54,69,110,.18); border:4px solid white; overflow:hidden; }
+    header { padding:28px 20px; text-align:center; background:linear-gradient(120deg,#7c5cff,#3bb6ff,#43d17a); color:white; }
+    header h1 { margin:0; font-size:clamp(28px,5vw,52px); text-shadow:0 3px 12px rgba(0,0,0,.15); }
+    header p { margin:10px 0 0; font-size:clamp(17px,2.4vw,24px); font-weight:700; }
+    main { padding:22px; }
+    .card { background:white; border:3px solid #e5efff; border-radius:28px; padding:22px; box-shadow:0 10px 25px rgba(90,111,145,.10); margin-bottom:18px; }
+    .hidden { display:none !important; }
+    .welcome { display:grid; grid-template-columns:1.1fr .9fr; gap:20px; align-items:center; }
+    .mascot { background:linear-gradient(160deg,#fff4bf,#ffd9ee); border-radius:28px; padding:22px; text-align:center; border:3px dashed #ff9fd0; }
+    .emoji { font-size:clamp(76px,13vw,145px); line-height:1; animation:floaty 2.3s ease-in-out infinite; }
+    @keyframes floaty { 0%,100%{transform:translateY(0) rotate(-2deg)} 50%{transform:translateY(-10px) rotate(2deg)} }
+    .menu-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(215px,1fr)); gap:14px; margin-top:18px; }
+    button { border:none; cursor:pointer; border-radius:22px; font-size:18px; font-weight:900; padding:16px 18px; transition:transform .12s,box-shadow .12s,filter .12s; box-shadow:0 8px 17px rgba(41,59,90,.17); line-height:1.35; }
+    button:hover { transform:translateY(-2px) scale(1.01); filter:brightness(1.03); }
+    button:active { transform:translateY(1px) scale(.99); }
+    .btn-blue { background:linear-gradient(135deg,#4e8fff,#31c7ff); color:white; }
+    .btn-green { background:linear-gradient(135deg,#39bd6c,#8ce851); color:white; }
+    .btn-pink { background:linear-gradient(135deg,#ff64ac,#ff9a6c); color:white; }
+    .btn-purple { background:linear-gradient(135deg,#9866ff,#d462ff); color:white; }
+    .btn-yellow { background:linear-gradient(135deg,#ffd34f,#ff9f43); color:#4b3100; }
+    .btn-gray { background:#eef3fb; color:#26324b; }
+    .note { background:#fff8dd; border:2px solid #ffe18a; border-radius:22px; padding:16px; font-size:18px; line-height:1.7; font-weight:700; }
+    .top-row { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; font-size:18px; font-weight:900; margin-bottom:10px; }
+    .pill { background:#eef6ff; border:2px solid #d7e9ff; border-radius:999px; padding:10px 14px; }
+    .progress-wrap { height:18px; background:#e7edf8; border-radius:999px; overflow:hidden; margin:12px 0 18px; }
+    .progress { height:100%; width:0; background:linear-gradient(90deg,#43d17a,#31c7ff,#9866ff); transition:width .25s; }
+    .word-box { text-align:center; margin:12px 0 20px; padding:28px 18px; background:linear-gradient(135deg,#f2fbff,#fff1fa); border-radius:30px; border:3px dashed #9fc7ff; }
+    .small-label { font-size:18px; font-weight:900; color:#5a6b87; margin-bottom:10px; }
+    .big-word { font-size:clamp(42px,8vw,78px); font-weight:1000; line-height:1.15; color:#252b55; }
+    .choices { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:14px; }
+    .choice { background:white; border:3px solid #dce9fb; color:#253047; min-height:76px; font-size:24px; }
+    .choice.correct { background:#d9ffe8; border-color:#22b964; color:#0a7c39; animation:pop .22s ease-out; }
+    .choice.wrong { background:#ffe1e6; border-color:#ff5771; color:#a30e25; animation:shake .28s ease-in-out; }
+    @keyframes pop { 0%{transform:scale(1)} 55%{transform:scale(1.08)} 100%{transform:scale(1)} }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+    .typing-area { display:grid; grid-template-columns:1fr auto; gap:12px; margin-top:12px; }
+    input { width:100%; border:3px solid #dce9fb; border-radius:22px; padding:18px; font-size:26px; outline:none; text-align:center; direction:auto; font-weight:800; }
+    input:focus { border-color:#4e8fff; box-shadow:0 0 0 5px rgba(78,143,255,.13); }
+    .feedback { min-height:42px; text-align:center; font-size:clamp(22px,4vw,34px); font-weight:1000; margin:18px 0 8px; }
+    .explain { min-height:32px; text-align:center; font-size:20px; color:#53627b; font-weight:800; }
+    .actions { display:flex; justify-content:center; flex-wrap:wrap; gap:12px; margin-top:18px; }
+    table { width:100%; border-collapse:collapse; overflow:hidden; border-radius:20px; font-size:20px; margin-top:14px; }
+    th,td { padding:15px 10px; text-align:center; border-bottom:1px solid #e2ebfa; }
+    th { background:#eaf4ff; } tr:nth-child(even) td { background:#fbfdff; }
+    .stars { font-size:clamp(40px,9vw,74px); text-align:center; margin:10px 0; }
+    .final-score { font-size:clamp(24px,5vw,40px); text-align:center; font-weight:1000; color:#263054; }
+    .confetti { position:fixed; top:-20px; width:16px; height:24px; border-radius:5px; z-index:9999; pointer-events:none; animation:fall 1.7s linear forwards; }
+    @keyframes fall { 0%{transform:translateY(-30px) rotate(0deg) scale(1);opacity:1} 100%{transform:translateY(110vh) rotate(720deg) scale(1.25);opacity:0} }
+    @media(max-width:700px){ .welcome{grid-template-columns:1fr} main{padding:14px} .typing-area{grid-template-columns:1fr} button{width:100%} .top-row{justify-content:center;text-align:center} }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header><h1>🌟 لعبة الكلمات لجود 🌟</h1><p>עברית ↔ ערבית | בריאות وصحة</p></header>
+    <main>
+      <section id="menu" class="card">
+        <div class="welcome">
+          <div><h2>היי ג׳וד! جاهزة نتمرّن؟ 💪</h2><p class="note">בחרי משחק. כל תשובה נכונה עושה חגיגה 🎉<br>אם טעית — לא נורא! המשחק יראה לך את התשובה הנכונה.</p></div>
+          <div class="mascot"><div class="emoji">🦄</div><h2>جود البطلة</h2><p>كل تدريب صغير = نجاح كبير</p></div>
+        </div>
+        <div class="menu-grid">
+          <button class="btn-green" onclick="startQuiz('heToArOptions')">עברית → ערבית<br>اختيار من إجابات</button>
+          <button class="btn-blue" onclick="startQuiz('arToHeOptions')">ערבית → עברית<br>اختيار من إجابات</button>
+          <button class="btn-pink" onclick="startQuiz('heToArTyping')">עברית → ערבית<br>כתיבה לבד ✍️</button>
+          <button class="btn-purple" onclick="startQuiz('arToHeTyping')">ערבית → עברית<br>כתיבה לבד ✍️</button>
+          <button class="btn-yellow" onclick="showVocabulary()">טבלת מילים<br>جدول الكلمات</button>
+        </div>
+      </section>
+      <section id="quiz" class="card hidden">
+        <div class="top-row"><div class="pill" id="quizTitle">תרגול</div><div class="pill">שאלה <span id="qNum">1</span>/<span id="qTotal">10</span></div><div class="pill">ניקוד: <span id="score">0</span></div></div>
+        <div class="progress-wrap"><div id="progress" class="progress"></div></div>
+        <div class="word-box"><div id="questionLabel" class="small-label">מה הפירוש?</div><div id="questionWord" class="big-word">בריאות</div></div>
+        <div id="choices" class="choices"></div>
+        <div id="typingBox" class="typing-area hidden"><input id="answerInput" placeholder="اكتبي / כתבי כאן" onkeydown="if(event.key==='Enter') checkTypedAnswer()" /><button class="btn-blue" onclick="checkTypedAnswer()">בדיקה</button></div>
+        <div id="feedback" class="feedback"></div><div id="explain" class="explain"></div>
+        <div class="actions"><button id="nextBtn" class="btn-green hidden" onclick="nextQuestion()">השאלה הבאה ➜</button><button class="btn-gray" onclick="backToMenu()">🏠 חזרה לעמוד הראשי</button></div>
+      </section>
+      <section id="results" class="card hidden"><h2 style="text-align:center;">כל הכבוד ג׳וד! أحسنتِ يا جود! 🎉</h2><div id="stars" class="stars"></div><p id="finalScore" class="final-score"></p><div id="mistakesBox"></div><div class="actions"><button class="btn-green" onclick="restartSameQuiz()">שוב אותו משחק</button><button class="btn-blue" onclick="backToMenu()">🏠 לבחור משחק אחר</button></div></section>
+      <section id="vocab" class="card hidden"><h2>טבלת מילים لجود</h2><table><thead><tr><th>עברית</th><th>ערבית</th></tr></thead><tbody id="vocabTable"></tbody></table><div class="actions"><button class="btn-gray" onclick="backToMenu()">🏠 חזרה לעמוד הראשי</button></div></section>
+    </main>
+  </div>
+<script>
+const words=[{he:"בריאות",ar:"صحة"},{he:"בריא",ar:"صحي"},{he:"תזונה",ar:"تغذية"},{he:"משרד הבריאות",ar:"وزارة الصحة"},{he:"גוף",ar:"جسم"},{he:"כח",ar:"قوة"}];
+let quizType="heToArOptions",questions=[],index=0,score=0,answered=false,mistakes=[];
+const menu=document.getElementById("menu"),quiz=document.getElementById("quiz"),results=document.getElementById("results"),vocab=document.getElementById("vocab");
+function shuffle(array){const arr=[...array];for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]]}return arr}
+function hideAll(){menu.classList.add("hidden");quiz.classList.add("hidden");results.classList.add("hidden");vocab.classList.add("hidden")}
+function makeQuestions(type){let base=[];if(type==="heToArOptions"||type==="heToArTyping"){base=words.map(w=>({word:w.he,answer:w.ar,from:"he",to:"ar",pair:w}))}else{base=words.map(w=>({word:w.ar,answer:w.he,from:"ar",to:"he",pair:w}))}return shuffle([...base,...base]).slice(0,10)}
+function startQuiz(type){quizType=type;questions=makeQuestions(type);index=0;score=0;answered=false;mistakes=[];hideAll();quiz.classList.remove("hidden");const titles={heToArOptions:"עברית → ערבית | בחירה",arToHeOptions:"ערבית → עברית | בחירה",heToArTyping:"עברית → ערבית | כתיבה",arToHeTyping:"ערבית → עברית | כתיבה"};document.getElementById("quizTitle").textContent=titles[type];document.getElementById("qTotal").textContent=questions.length;document.getElementById("score").textContent=score;renderQuestion()}
+function renderQuestion(){answered=false;const q=questions[index];document.getElementById("qNum").textContent=index+1;document.getElementById("progress").style.width=`${(index/questions.length)*100}%`;document.getElementById("questionWord").textContent=q.word;document.getElementById("feedback").textContent="";document.getElementById("explain").textContent="";document.getElementById("nextBtn").classList.add("hidden");const isTyping=quizType.includes("Typing"),choicesDiv=document.getElementById("choices"),typingBox=document.getElementById("typingBox");document.getElementById("questionLabel").textContent=q.to==="ar"?(isTyping?"כתבי את המילה בערבית":"בחרי את המילה בערבית"):(isTyping?"כתבי את המילה בעברית":"בחרי את המילה בעברית");choicesDiv.innerHTML="";if(isTyping){choicesDiv.classList.add("hidden");typingBox.classList.remove("hidden");const input=document.getElementById("answerInput");input.value="";input.focus()}else{typingBox.classList.add("hidden");choicesDiv.classList.remove("hidden");const optionKey=q.to,options=shuffle(words.map(w=>w[optionKey]));options.forEach(opt=>{const btn=document.createElement("button");btn.className="choice";btn.textContent=opt;btn.onclick=()=>checkChoice(btn,opt,q.answer);choicesDiv.appendChild(btn)})}}
+function checkChoice(button,selected,correct){if(answered)return;answered=true;const q=questions[index];document.querySelectorAll(".choice").forEach(b=>{if(b.textContent===correct)b.classList.add("correct");b.disabled=true});if(selected===correct){button.classList.add("correct");score++;document.getElementById("feedback").textContent="נכון! ممتاز يا جود! 🌟";document.getElementById("explain").textContent=`${q.pair.he} = ${q.pair.ar}`;bigConfetti()}else{button.classList.add("wrong");mistakes.push({question:q.word,answer:correct,selected:selected});document.getElementById("feedback").textContent="כמעט! مش مشكلة، نتعلم 💛";document.getElementById("explain").textContent=`התשובה הנכונה: ${correct} | ${q.pair.he} = ${q.pair.ar}`;}document.getElementById("score").textContent=score;document.getElementById("nextBtn").classList.remove("hidden")}
+function normalizeText(text){return text.trim().replace(/[ًٌٍَُِّْـ]/g,"").replace(/\s+/g," ").replace(/[أإآ]/g,"ا").replace(/ة/g,"ه")}
+function checkTypedAnswer(){if(answered)return;const q=questions[index],typedOriginal=document.getElementById("answerInput").value.trim(),typed=normalizeText(typedOriginal),correct=normalizeText(q.answer);if(!typed){document.getElementById("feedback").textContent="اكتبي إجابة أولاً ✍️";return}answered=true;if(typed===correct){score++;document.getElementById("feedback").textContent="נכון! כתיבה מושלמת يا جود! 🎉";document.getElementById("explain").textContent=`${q.pair.he} = ${q.pair.ar}`;bigConfetti()}else{mistakes.push({question:q.word,answer:q.answer,selected:typedOriginal});document.getElementById("feedback").textContent="לא נכון, אבל ניסיון טוב 💛";document.getElementById("explain").textContent=`התשובה הנכונה: ${q.answer} | ${q.pair.he} = ${q.pair.ar}`}document.getElementById("score").textContent=score;document.getElementById("nextBtn").classList.remove("hidden")}
+function nextQuestion(){if(index<questions.length-1){index++;renderQuestion()}else showResults()}
+function showResults(){hideAll();results.classList.remove("hidden");document.getElementById("finalScore").textContent=`הניקוד שלך: ${score} מתוך ${questions.length}`;const percent=score/questions.length,stars=document.getElementById("stars");if(percent===1){stars.textContent="⭐⭐⭐⭐⭐";bigConfetti()}else if(percent>=.8)stars.textContent="⭐⭐⭐⭐";else if(percent>=.6)stars.textContent="⭐⭐⭐";else stars.textContent="⭐⭐";const box=document.getElementById("mistakesBox");if(mistakes.length===0){box.innerHTML=`<p class="note" style="text-align:center;">וואו! בלי טעויות בכלל! جود بطلة الكلمات 🏆</p>`}else{box.innerHTML=`<h3>מילים שכדאי לחזור עליהן:</h3><table><thead><tr><th>השאלה</th><th>התשובה הנכונה</th><th>מה נכתב/נבחר</th></tr></thead><tbody>${mistakes.map(m=>`<tr><td>${m.question}</td><td>${m.answer}</td><td>${m.selected}</td></tr>`).join("")}</tbody></table>`}}
+function restartSameQuiz(){startQuiz(quizType)}
+function backToMenu(){hideAll();menu.classList.remove("hidden")}
+function showVocabulary(){hideAll();vocab.classList.remove("hidden");document.getElementById("vocabTable").innerHTML=words.map(w=>`<tr><td>${w.he}</td><td>${w.ar}</td></tr>`).join("")}
+function bigConfetti(){const colors=["#ff4d6d","#ffd166","#06d6a0","#4d96ff","#b76eff","#ff9f1c"];for(let i=0;i<55;i++){const piece=document.createElement("div");piece.className="confetti";piece.style.left=Math.random()*100+"vw";piece.style.background=colors[Math.floor(Math.random()*colors.length)];piece.style.animationDelay=Math.random()*.35+"s";piece.style.width=12+Math.random()*16+"px";piece.style.height=16+Math.random()*22+"px";document.body.appendChild(piece);setTimeout(()=>piece.remove(),2200)}}
+</script>
+</body>
+</html>
